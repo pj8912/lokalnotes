@@ -1,121 +1,297 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <meta name="description" content="LokalNotes - On-Browser Notesapp"> 
-  <meta name="keywords" content="textfile, .txt, Local noteaspp, notesapp, local storage,Note taking, memo, writing tool, productivity,Plain text, markdown, formatting, editor,Save notes, delete notes, edit notes, copy notes,Responsive design, Backup, HTML, CSS, JavaScript, organize, tags,Reminders, to-do lists, tasks"> 
-  <meta name="author" content="John Pinto"> <meta name="twitter:image" content="https://lokalnotes.com/localstorage.png"> <meta property="og:image" content="https://lokalnotes.com/localstorage.png"> <meta property="og:title" content="LokalNotes"> 
-  <meta name="twitter:title" content="LokalNotes"> <meta name="twitter:description" content="LokalNotes - On-Browser Notesapp"> 
-  <link rel="icon" href="localstorage.ico" type="image/x-icon"> <link rel="stylesheet" href="style.css"> <title>LokalNotes</title>
-  <script src="https://kit.fontawesome.com/dd021511bc.js" crossorigin="anonymous"></script> </head> 
-  <body> 
-    <header> 
-      <div class="head-title"> 
-  
-        <!-- <h1>LokalNotes</h1> -->
-        <a href="https://lokalnotes.com/">LokalNotes</a> 
-      </div> 
-      <div class="links"> 
-        <a href="https://lokalnotes.com/about.html">About</a> 
-        <span class="hline"></span>
-        <a href="https://lokalnotes.com/">Contact</a> </div>
-    </header> <br>
-    <div class="wrapper"> 
-      <div class="side-container">
-        <div class="buttons"> 
-          <span class="side-title">Notes</span> 
-          <span class="all-conf"> 
-            <i class="fa fa-add tooltip" onclick="createNote()"> 
-              <span class="tooltiptext">Add A Note</span></i> 
-            <i class="fa fa-trash tooltip" onclick="deleteAllNotes()"> 
-              <span class="tooltiptext">delete all notes</span>
-            </i> 
-          </span> 
-        </div> 
-        <hr><br> 
-        <div class="messagediv"></div>
-        <br> 
-        <div class="allnotes"></div> 
-      </div> 
-      <div class="main-container"> 
-      </div> 
-      <!-- <div class="notesmessage"></div> --> 
-    </div> 
-    <script> 
-      function createNote() { 
-        if (localStorage.getItem('notesData') === null) { 
-          // If the notesData property doesn't exist, create a new notesData object 
-          var noteName = Date.now(); var notesData = {};
-          notesData[noteName] = '';
-          localStorage.setItem('notesData', JSON.stringify(notesData)); 
-        } else { 
-          // If the notesData property already exists, add a new note to it 
-          var noteName = Date.now(); 
-          var notesDataJSON = localStorage.getItem('notesData');
-          var notesData = JSON.parse(notesDataJSON); notesData[noteName] = '';
-          localStorage.setItem('notesData', JSON.stringify(notesData));
-        } 
-        location.reload(); 
-      }
-      
-      function deleteAllNotes() 
-      { localStorage.removeItem('notesData'); 
-       location.reload();
-       displayNotes(); 
-      }
-      function displayNotes() 
-      {
-        message = `<div id="starter" style="text-align:center;margin: 0 auto"> <h1>LokalNotes</h1> <br> On-Browser Notesapp </div>` 
-        document.querySelector('.main-container').innerHTML = message; // Get the notesData object from localStorage 
-        var notesDataJSON = localStorage.getItem('notesData');
-        var notesData = JSON.parse(notesDataJSON); // Get the div element where the notes will be displayed 
-        var allNotesDiv = document.querySelector('.allnotes');
-        var messagediv = document.querySelector('.messagediv');
-        if (localStorage.getItem('notesData') === null) {
-          // If there are no notes, display a message 
-          messagediv.innerHTML = 'No notes created'; 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LokalNotes - On-Browser Notesapp">
+    <meta name="keywords" content="textfile, .txt, Local noteaspp, notesapp, local storage,Note taking, memo, writing tool, productivity,Plain text, markdown, formatting, editor,Save notes, delete notes, edit notes, copy notes,Responsive design, Backup, HTML, CSS, JavaScript, organize, tags,Reminders, to-do lists, tasks">
+    <meta name="author" content="John Pinto">
+    <meta name="twitter:image" content="https://lokalnotes.com/localstorage.png">
+    <meta property="og:image" content="https://lokalnotes.com/localstorage.png">
+    <meta property="og:title" content="LokalNotes">
+    <meta name="twitter:title" content="LokalNotes">
+    <meta name="twitter:description" content="LokalNotes - On-Browser Notesapp">
+    <link rel="icon" href="localstorage.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <title>LokalNotes</title>
+    <script src="https://kit.fontawesome.com/dd021511bc.js" crossorigin="anonymous"></script>
+</head>
+<body>
+ 
+    <header>
+        <div class="head-title">
+            <!-- <h1>LokalNotes</h1> -->
+            <a href="https://lokalnotes.com/">LokalNotes</a>
+        </div>
+        <div class="links">
+            <a href="https://lokalnotes.com/about.html">About</a>
+            <span class="hline"></span>
+            <a href="https://lokalnotes.com/">Contact</a>
+
+        </div>
+    </header>
+    <br>
+    <div class="wrapper">
+        <div class="side-container">
+            <div class="buttons">
+                <span class="side-title">Notes</span>
+                <span class="all-conf">
+                    <i class="fa fa-add tooltip" onclick="createNote()"> <span class="tooltiptext">Add A Note</span></i>
+                    <i class="fa fa-trash tooltip" onclick="deleteAllNotes()"> <span class="tooltiptext">delete all
+                            notes</span></i>
+                </span>
+            </div>
+            <hr><br>
+            <div class="messagediv"></div><br>
+            <div class="allnotes"></div>
+        </div>
+        <div class="main-container">
+        </div>
+        <!-- <div class="notesmessage"></div> -->
+    </div>
+
+    <script>
+
+        function createNote() {
+            if (localStorage.getItem('notesData') === null) {
+                // If the notesData property doesn't exist, create a new notesData object
+                var noteName = Date.now();
+                var notesData = {};
+                notesData[noteName] = '';
+                localStorage.setItem('notesData', JSON.stringify(notesData));
+            } else {
+                // If the notesData property already exists, add a new note to it
+                var noteName = Date.now();
+                var notesDataJSON = localStorage.getItem('notesData');
+                var notesData = JSON.parse(notesDataJSON);
+                notesData[noteName] = '';
+                localStorage.setItem('notesData', JSON.stringify(notesData));
+            }
+            location.reload();
         }
-        else {
-          Object.keys(notesData).forEach(function (noteName) 
-                                         { 
-            var li = document.createElement('div') 
-            li.setAttribute('class', 'noteNameDiv')
-            li.style.display = "flex";
-            li.style.flexDirection = "row"; 
-            // li.style.gap = "6px";
-            li.innerHTML = `<span class="viewnote">${noteName}</span> <span class="conf"> <i class="fas fa-copy tooltip copy-icon"><span class="tooltiptext">Copy</span></i> <i class="fas fa-cloud-download-alt tooltip download-icon"><span class="tooltiptext">Download</span></i> <i class="fas fa-trash-alt tooltip tooltip delete-icon"><span class="tooltiptext">Delete</span></i></span>`; 
-            allNotesDiv.appendChild(li);
-            var hr = document.createElement('hr');
-            allNotesDiv.appendChild(hr); });
+
+        function deleteAllNotes() {
+            localStorage.removeItem('notesData');
+            location.reload();
+            displayNotes();
         }
-      }
-      function currentNoteNameDisplay(currName) 
-      {
-        var viewnoteElements = document.querySelectorAll('.viewnote'); 
-        viewnoteElements.forEach(function (viewnoteElement) { 
-          // viewnoteElement.addEventListener('click', function () { }) 
-          if (currName != viewnoteElement.textContent) {
-            viewnoteElement.style.background = 'white'; 
-            viewnoteElement.parentElement.style.background = 'white'; 
-            viewnoteElement.style.fontWeight = 'lighter'; 
-            viewnoteElement.style.padding = '0px';
-            // viewnoteElement.remove('*')
-          }
-          else {
-            viewnoteElement.style.background = 'whitesmoke'; 
-            viewnoteElement.parentElement.style.background = 'whitesmoke'; 
-            viewnoteElement.style.padding = '5px'; 
-            viewnoteElement.parentElement.style.padding = '5px';
-            viewnoteElement.style.fontWeight = '900';
-          }
-        })
-      }
-      window.onload = () => { 
-        displayNotes() var viewnoteElements = document.querySelectorAll('.viewnote'); // Add an event listener to each element to get the corresponding note name value viewnoteElements.forEach(function (viewnoteElement) { viewnoteElement.addEventListener('click', function () { var noteName = this.textContent; // Get the text content of the span element currentNoteNameDisplay(noteName) // highlight the note selected var notesDataJSON = localStorage.getItem("notesData"); var notesData = JSON.parse(notesDataJSON); var noteValue = notesData[noteName]; console.log(`${noteName} : ${noteValue}`); var textarea = document.createElement('textarea'); textarea.value = noteValue; var saveButton = document.createElement('button'); saveButton.setAttribute('class', 'savebutton') saveButton.innerText = 'Save Note'; saveButton.style.paddingBottom = '5px'; saveButton.onclick = () => { notesData[noteName] = textarea.value; localStorage.setItem('notesData', JSON.stringify(notesData)); // alert('notes saved') // prompt('notes saved') let messageDiv = document.querySelector('.messagediv'); messageDiv.style.background = "green"; messageDiv.style.color = "white"; messageDiv.style.fontWeight = "bold"; messageDiv.innerText = 'Note Saved'; setTimeout(() => { messageDiv.innerText = ''; }, 2000); } var mainContainer = document.querySelector('.main-container'); mainContainer.innerHTML = ''; mainContainer.appendChild(textarea); var br = document.createElement('br'); mainContainer.appendChild(br); mainContainer.appendChild(saveButton); textarea.placeholder = "Write Something..." textarea.autocomplete = "off"; textarea.style.width = "inherit"; textarea.style.height = "inherit"; textarea.style.border = "none"; textarea.style.outline = "none"; textarea.style.padding = "5px"; }); }); const deleteIcons = document.querySelectorAll('.delete-icon'); // Add click event listener to each delete icon deleteIcons.forEach(icon => { icon.addEventListener('click', (event) => { const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText; var notesDataJSON = localStorage.getItem("notesData"); var notesData = JSON.parse(notesDataJSON); // Remove note from local storage delete notesData[noteName]; localStorage.setItem("notesData", JSON.stringify(notesData)); // Remove note from UI const noteContainer = event.target.parentElement.parentElement; const hrElement = noteContainer.nextElementSibling; noteContainer.remove(); hrElement.remove(); location.reload(); }); }); // download const downloadIcons = document.querySelectorAll('.download-icon'); // Add click event listener to each download icon downloadIcons.forEach(icon => { icon.addEventListener('click', (event) => { const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText; // const noteContent = localStorage.getItem('notesData')[noteName]; const noteContent = JSON.parse(localStorage.getItem('notesData'))[noteName] // Create a new blob object with the note content and set the MIME type to text/plain const blob = new Blob([noteContent], { type: 'text/plain' }); const url = URL.createObjectURL(blob); // Create a new anchor element with the generated URL and set the download attribute to the note name const link = document.createElement('a'); link.href = url; link.download = `${noteName}.txt`; // Trigger a click event on the anchor element to initiate the download link.click(); }); }); // Add click event listener to copy icon const copyIcons = document.querySelectorAll('.copy-icon'); copyIcons.forEach(function (copyIcon) { copyIcon.addEventListener('click', function () { copyIcon.addEventListener('click', (event) => { const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText; const noteValue = JSON.parse(localStorage.getItem('notesData'))[noteName]; navigator.clipboard.writeText(noteValue) .then(() => { let messageDiv = document.querySelector('.messagediv'); messageDiv.style.background = "green"; messageDiv.style.color = "white"; messageDiv.style.fontWeight = "bold"; messageDiv.innerText = 'Note copied to clipboard'; setTimeout(() => { messageDiv.innerText = ''; }, 2000); }) .catch((error) => { console.log('Error copying note to clipboard:', error); }); }); }) }) } 
+
+
+        function displayNotes() {
+            message = `<div  id="starter" style="text-align:center;margin: 0 auto">
+                        <h1>LokalNotes</h1>
+                        <br>
+                        On-Browser Notesapp
+                        </div>`
+            document.querySelector('.main-container').innerHTML = message;
+            // Get the notesData object from localStorage
+            var notesDataJSON = localStorage.getItem('notesData');
+            var notesData = JSON.parse(notesDataJSON);
+
+            // Get the div element where the notes will be displayed
+            var allNotesDiv = document.querySelector('.allnotes');
+            var messagediv = document.querySelector('.messagediv');
+
+            if (localStorage.getItem('notesData') === null) {
+                // If there are no notes, display a message
+                messagediv.innerHTML = 'No notes created';
+            }
+            else {
+                Object.keys(notesData).forEach(function (noteName) {
+                    var li = document.createElement('div')
+                    li.setAttribute('class', 'noteNameDiv')
+                    li.style.display = "flex";
+                    li.style.flexDirection = "row";
+                    // li.style.gap = "6px";
+                    li.innerHTML = `<span class="viewnote">${noteName}</span>
+                    <span class="conf">
+                        <i class="fas fa-copy tooltip copy-icon"><span class="tooltiptext">Copy</span></i>
+                        <i class="fas fa-cloud-download-alt tooltip download-icon"><span class="tooltiptext">Download</span></i>
+                        <i class="fas fa-trash-alt tooltip tooltip delete-icon"><span class="tooltiptext">Delete</span></i></span>`;
+
+                    allNotesDiv.appendChild(li);
+                    var hr = document.createElement('hr');
+                    allNotesDiv.appendChild(hr);
+                });
+
+
+            }
+        }
+         
+        function currentNoteNameDisplay(currName) {
+
+            var viewnoteElements = document.querySelectorAll('.viewnote');
+            viewnoteElements.forEach(function (viewnoteElement) {
+                // viewnoteElement.addEventListener('click', function () { })
+
+                if (currName != viewnoteElement.textContent) { 
+                    viewnoteElement.style.background = 'white';
+                    viewnoteElement.parentElement.style.background = 'white';
+                    viewnoteElement.style.fontWeight = 'lighter';
+                    viewnoteElement.style.padding = '0px';
+                    // viewnoteElement.remove('*')
+
+                 }
+                else {
+                    viewnoteElement.style.background = 'whitesmoke';
+                    viewnoteElement.parentElement.style.background = 'whitesmoke';
+                    viewnoteElement.style.padding = '5px';
+                    viewnoteElement.parentElement.style.padding = '5px';
+                    viewnoteElement.style.fontWeight = '900';
+
+                }
+            })
+        }
+
+        window.onload = () => {
+
+            displayNotes()
+
+
+            var viewnoteElements = document.querySelectorAll('.viewnote');
+
+            // Add an event listener to each element to get the corresponding note name value
+            viewnoteElements.forEach(function (viewnoteElement) {
+                viewnoteElement.addEventListener('click', function () {
+                    var noteName = this.textContent; // Get the text content of the span element
+                    currentNoteNameDisplay(noteName) // highlight the note selected
+                    var notesDataJSON = localStorage.getItem("notesData");
+                    var notesData = JSON.parse(notesDataJSON);
+                    var noteValue = notesData[noteName];
+                    console.log(`${noteName} : ${noteValue}`);
+
+                    var textarea = document.createElement('textarea');
+                    textarea.value = noteValue;
+
+                    var saveButton = document.createElement('button');
+                    saveButton.setAttribute('class', 'savebutton')
+                    saveButton.innerHTML = `<i class="fas fa-save"></i> Save Note`;
+                    saveButton.style.paddingBottom = '5px';
+
+
+
+                    saveButton.onclick = () => {
+                        notesData[noteName] = textarea.value;
+                        localStorage.setItem('notesData', JSON.stringify(notesData));
+                        let messageDiv = document.querySelector('.messagediv');
+                        messageDiv.style.color = "green";
+                        messageDiv.style.fontWeight = "bold";
+
+
+                        messageDiv.innerText = 'Note Saved!';
+                        setTimeout(() => {
+                            messageDiv.innerText = '';
+                        }, 2000);
+
+                    }
+
+                    var mainContainer = document.querySelector('.main-container');
+                    mainContainer.innerHTML = '';
+                    mainContainer.appendChild(textarea);
+                    var br = document.createElement('br');
+                    mainContainer.appendChild(br);
+
+                    mainContainer.appendChild(saveButton);
+
+                    textarea.placeholder = "Write Something..."
+                    textarea.autocomplete = "off";
+                    textarea.style.width = "inherit";
+                    textarea.style.height = "inherit";
+                    textarea.style.border = "none";
+                    textarea.style.outline = "none";
+                    textarea.style.padding = "5px";
+
+
+
+                });
+
+            });
+
+            const deleteIcons = document.querySelectorAll('.delete-icon');
+
+            // Add click event listener to each delete icon
+            deleteIcons.forEach(icon => {
+                icon.addEventListener('click', (event) => {
+                    const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText;
+                    var notesDataJSON = localStorage.getItem("notesData");
+                    var notesData = JSON.parse(notesDataJSON);
+                    // Remove note from local storage
+                    delete notesData[noteName];
+                    localStorage.setItem("notesData", JSON.stringify(notesData));
+                    // Remove note from UI
+                    const noteContainer = event.target.parentElement.parentElement;
+                    const hrElement = noteContainer.nextElementSibling;
+                    noteContainer.remove();
+                    hrElement.remove();
+                    location.reload();
+
+
+                });
+            });
+
+            // download
+            const downloadIcons = document.querySelectorAll('.download-icon');
+
+            // Add click event listener to each download icon
+            downloadIcons.forEach(icon => {
+                icon.addEventListener('click', (event) => {
+                    const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText;
+                    // const noteContent = localStorage.getItem('notesData')[noteName];
+                    const noteContent = JSON.parse(localStorage.getItem('notesData'))[noteName]
+                    // Create a new blob object with the note content and set the MIME type to text/plain
+                    const blob = new Blob([noteContent], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+
+                    // Create a new anchor element with the generated URL and set the download attribute to the note name
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${noteName}.txt`;
+
+                    // Trigger a click event on the anchor element to initiate the download
+                    link.click();
+                });
+            });
+
+            // Add click event listener to copy icon
+            const copyIcons = document.querySelectorAll('.copy-icon');
+            copyIcons.forEach(function (copyIcon) {
+                copyIcon.addEventListener('click', function () {
+
+                    copyIcon.addEventListener('click', (event) => {
+                        const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText;
+                        const noteValue = JSON.parse(localStorage.getItem('notesData'))[noteName];
+                        navigator.clipboard.writeText(noteValue)
+                            .then(() => {
+                                let messageDiv = document.querySelector('.messagediv');
+                                messageDiv.style.background = "green";
+                                messageDiv.style.color = "white";
+                                messageDiv.style.fontWeight = "bold";
+                                messageDiv.innerText = 'Note copied to clipboard';
+                                setTimeout(() => {
+                                    messageDiv.innerText = '';
+                                }, 2000);
+                            })
+                            .catch((error) => {
+                                console.log('Error copying note to clipboard:', error);
+                            });
+                    });
+
+                })
+            })
+
+
+        }
     </script>
-    <!-- Google tag (gtag.js) --> 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLM17GZ43H"></script> 
-    <script> 
-      window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-ZLM17GZ43H'); 
-    </script> 
-  </body> 
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLM17GZ43H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZLM17GZ43H');
+</script>
+</body>
+
 </html>
