@@ -224,3 +224,8 @@ textarea {
     text-decoration: none;
     color: black
 }
+
+.CodeMirror {
+    display: block;
+    max-height: 900px;
+}

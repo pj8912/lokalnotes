@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="LokalNotes - On-Browser Notesapp">
-    <meta name="keywords" content="textfile, .txt, Local noteaspp, notesapp, local storage,Note taking, memo, writing tool, productivity,Plain text, markdown, formatting, editor,Save notes, delete notes, edit notes, copy notes,Responsive design, Backup, HTML, CSS, JavaScript, organize, tags,Reminders, to-do lists, tasks">
+    <meta name="keywords"
+        content="textfile, .txt, Local noteaspp, notesapp, local storage,Note taking, memo, writing tool, productivity,Plain text, markdown, formatting, editor,Save notes, delete notes, edit notes, copy notes,Responsive design, Backup, HTML, CSS, JavaScript, organize, tags,Reminders, to-do lists, tasks">
     <meta name="author" content="John Pinto">
     <meta name="twitter:image" content="https://lokalnotes.com/localstorage.png">
     <meta property="og:image" content="https://lokalnotes.com/localstorage.png">
@@ -16,19 +18,24 @@
     <link rel="stylesheet" href="style.css">
     <title>LokalNotes</title>
     <script src="https://kit.fontawesome.com/dd021511bc.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+
 </head>
+
 <body>
- 
+
     <header>
         <div class="head-title">
             <!-- <h1>LokalNotes</h1> -->
-            <a href="https://lokalnotes.com/"><i class="fa-solid fa-database"></i> LokalNotes</a>
+            <a href="index.html"><i class="fa-solid fa-database"></i> LokalNotes</a>
         </div>
         <div class="links">
-            <a href="https://lokalnotes.com/about.html">About</a>
+            <a href="about.html">About</a>
             <span class="hline"></span>
-            <a href="https://lokalnotes.com/">Contact</a>
-
+            <a href="index.html">Contact</a>i
         </div>
     </header>
     <br>
@@ -118,21 +125,21 @@
 
             }
         }
-         
+
         function currentNoteNameDisplay(currName) {
 
             var viewnoteElements = document.querySelectorAll('.viewnote');
             viewnoteElements.forEach(function (viewnoteElement) {
                 // viewnoteElement.addEventListener('click', function () { })
 
-                if (currName != viewnoteElement.textContent) { 
+                if (currName != viewnoteElement.textContent) {
                     viewnoteElement.style.background = 'white';
                     viewnoteElement.parentElement.style.background = 'white';
                     viewnoteElement.style.fontWeight = 'lighter';
                     viewnoteElement.style.padding = '0px';
                     // viewnoteElement.remove('*')
 
-                 }
+                }
                 else {
                     viewnoteElement.style.background = 'whitesmoke';
                     viewnoteElement.parentElement.style.background = 'whitesmoke';
@@ -149,6 +156,7 @@
             displayNotes()
 
 
+            const simplemde = new SimpleMDE({ element: document.getElementById("file-input"), spellChecker: false });
             var viewnoteElements = document.querySelectorAll('.viewnote');
 
             // Add an event listener to each element to get the corresponding note name value
@@ -163,6 +171,15 @@
 
                     var textarea = document.createElement('textarea');
                     textarea.value = noteValue;
+                    textarea.setAttribute("id", "file-input")
+                    textarea.placeholder = "Write Something..."
+                    textarea.autocomplete = "off";
+                    textarea.style.width = "inherit";
+                    textarea.style.height = "inherit";
+                    textarea.style.border = "none";
+                    textarea.style.outline = "none";
+                    textarea.style.padding = "5px";
+
 
                     var saveButton = document.createElement('button');
                     saveButton.setAttribute('class', 'savebutton')
@@ -194,13 +211,6 @@
 
                     mainContainer.appendChild(saveButton);
 
-                    textarea.placeholder = "Write Something..."
-                    textarea.autocomplete = "off";
-                    textarea.style.width = "inherit";
-                    textarea.style.height = "inherit";
-                    textarea.style.border = "none";
-                    textarea.style.outline = "none";
-                    textarea.style.padding = "5px";
 
 
 
@@ -283,15 +293,17 @@
 
         }
     </script>
+    
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLM17GZ43H"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLM17GZ43H"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-  gtag('config', 'G-ZLM17GZ43H');
-</script>
+        gtag('config', 'G-ZLM17GZ43H');
+
+    </script>
 </body>
 
 </html>
