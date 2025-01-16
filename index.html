@@ -1,309 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="LokalNotes - On-Browser Notesapp">
-    <meta name="keywords"
-        content="textfile, .txt, Local noteaspp, notesapp, local storage,Note taking, memo, writing tool, productivity,Plain text, markdown, formatting, editor,Save notes, delete notes, edit notes, copy notes,Responsive design, Backup, HTML, CSS, JavaScript, organize, tags,Reminders, to-do lists, tasks">
-    <meta name="author" content="John Pinto">
-    <meta name="twitter:image" content="https://lokalnotes.com/localstorage.png">
-    <meta property="og:image" content="https://lokalnotes.com/localstorage.png">
-    <meta property="og:title" content="LokalNotes">
-    <meta name="twitter:title" content="LokalNotes">
-    <meta name="twitter:description" content="LokalNotes - On-Browser Notesapp">
-    <link rel="icon" href="localstorage.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
     <title>LokalNotes</title>
-    <script src="https://kit.fontawesome.com/dd021511bc.js" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
-
+    <meta name="description" content="LokalNotes - On-Browser Notesapp">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simplemde/1.11.2/simplemde.min.css" rel="stylesheet">
+    <style>
+        .note-item {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .note-item:hover {
+            background-color: #f8f9fa;
+        }
+        .note-item.active {
+            background-color: #212529;
+            color: white;
+            font-weight: bold;
+        }
+        .note-item.active .note-actions i {
+            color: #e9ecef;
+        }
+        .edit-title-icon {
+            display: none;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .note-item:hover .edit-title-icon {
+            display: inline;
+        }
+        .note-actions {
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .note-actions:hover {
+            opacity: 1;
+        }
+        .note-actions i {
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .sidebar {
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+        .editor-container {
+            height: calc(100vh - 60px);
+        }
+    </style>
 </head>
-
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-database-fill-down"></i> LokalNotes
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
 
-    <header>
-        <div class="head-title">
-            <!-- <h1>LokalNotes</h1> -->
-            <a href="index.html"><i class="fa-solid fa-database"></i> LokalNotes</a>
-        </div>
-        <div class="links">
-            <a href="about.html">About</a>
-            <span class="hline"></span>
-            <a href="index.html">Contact</a>i
-        </div>
-    </header>
-    <br>
-    <div class="wrapper">
-        <div class="side-container">
-            <div class="buttons">
-                <span class="side-title"><i class="fa-solid fa-notebook"></i> Notes</span>
-                <span class="all-conf">
-                    <i class="fa fa-add tooltip" onclick="createNote()"> <span class="tooltiptext">Add A Note</span></i>
-                    <i class="fa fa-trash tooltip" onclick="deleteAllNotes()"> <span class="tooltiptext">delete all
-                            notes</span></i>
-                </span>
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 bg-light sidebar p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-notebook me-2"></i>Notes</h5>
+                    <div>
+                        <button class="btn btn-sm btn-success me-2" onclick="createNote()" title="Add Note">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAllNotes()" title="Delete All">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="messageDiv" class="alert alert-success d-none"></div>
+                <div id="notesList" class="mt-3"></div>
             </div>
-            <hr><br>
-            <div class="messagediv"></div><br>
-            <div class="allnotes"></div>
+
+            <!-- Main Editor -->
+            <div class="col-md-9 col-lg-10 editor-container p-3">
+                <div id="editorContainer">
+                    <div id="welcomeMessage" class="text-center py-5">
+                        <h1> <i class="bi bi-database-down"></i> LokalNotes</h1>
+                        <p class="lead"> On-Browser Notesapp</p>
+                        <p class="text-secondary">Hosted on <i class="bi bi-github"></i> Github Pages</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="main-container">
-        </div>
-        <!-- <div class="notesmessage"></div> -->
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Rename Modal -->
+    <div class="modal fade" id="renameModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rename Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="newNoteName" placeholder="Enter new note name">
+                    <input type="hidden" id="noteToRename">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="app.renameNote()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplemde/1.11.2/simplemde.min.js"></script>
+
     <script>
-
-        function createNote() {
-            if (localStorage.getItem('notesData') === null) {
-                // If the notesData property doesn't exist, create a new notesData object
-                var noteName = Date.now();
-                var notesData = {};
-                notesData[noteName] = '';
-                localStorage.setItem('notesData', JSON.stringify(notesData));
-            } else {
-                // If the notesData property already exists, add a new note to it
-                var noteName = Date.now();
-                var notesDataJSON = localStorage.getItem('notesData');
-                var notesData = JSON.parse(notesDataJSON);
-                notesData[noteName] = '';
-                localStorage.setItem('notesData', JSON.stringify(notesData));
-            }
-            location.reload();
+    class NotesApp {
+        constructor() {
+            this.editor = null;
+            this.currentNote = null;
+            this.init();
         }
 
-        function deleteAllNotes() {
-            localStorage.removeItem('notesData');
-            location.reload();
-            displayNotes();
+        init() {
+            this.displayNotes();
+            this.setupEventListeners();
         }
 
+        showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        }
 
-        function displayNotes() {
-            message = `<div  id="starter" style="text-align:center;margin: 0 auto">
-                        <h1>LokalNotes</h1>
-                        <br>
-                        On-Browser Notesapp
-                        </div>`
-            document.querySelector('.main-container').innerHTML = message;
-            // Get the notesData object from localStorage
-            var notesDataJSON = localStorage.getItem('notesData');
-            var notesData = JSON.parse(notesDataJSON);
+        createNote() {
+            const noteName = Date.now().toString();
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            const noteMetadata = JSON.parse(localStorage.getItem('notesMetadata') || '{}');
+            
+            notesData[noteName] = '';
+            noteMetadata[noteName] = {
+                name: new Date(parseInt(noteName)).toLocaleDateString()
+            };
+            
+            localStorage.setItem('notesData', JSON.stringify(notesData));
+            localStorage.setItem('notesMetadata', JSON.stringify(noteMetadata));
+            
+            this.displayNotes();
+            this.showToast('New note created');
+        }
 
-            // Get the div element where the notes will be displayed
-            var allNotesDiv = document.querySelector('.allnotes');
-            var messagediv = document.querySelector('.messagediv');
+        getNoteName(noteName) {
+            const noteMetadata = JSON.parse(localStorage.getItem('notesMetadata') || '{}');
+            return noteMetadata[noteName]?.name || new Date(parseInt(noteName)).toLocaleDateString();
+        }
 
-            if (localStorage.getItem('notesData') === null) {
-                // If there are no notes, display a message
-                messagediv.innerHTML = 'No notes created';
+        renameNote() {
+            const noteId = document.getElementById('noteToRename').value;
+            const newName = document.getElementById('newNoteName').value.trim();
+            
+            if (!newName) {
+                this.showToast('Please enter a valid name', 'warning');
+                return;
             }
-            else {
-                Object.keys(notesData).forEach(function (noteName) {
-                    var li = document.createElement('div')
-                    li.setAttribute('class', 'noteNameDiv')
-                    li.style.display = "flex";
-                    li.style.flexDirection = "row";
-                    // li.style.gap = "6px";
-                    li.innerHTML = `<span class="viewnote">${noteName}</span>
-                    <span class="conf">
-                        <i class="fas fa-copy tooltip copy-icon"><span class="tooltiptext">Copy</span></i>
-                        <i class="fas fa-cloud-download-alt tooltip download-icon"><span class="tooltiptext">Download</span></i>
-                        <i class="fas fa-trash-alt tooltip tooltip delete-icon"><span class="tooltiptext">Delete</span></i></span>`;
 
-                    allNotesDiv.appendChild(li);
-                    var hr = document.createElement('hr');
-                    allNotesDiv.appendChild(hr);
-                });
+            const noteMetadata = JSON.parse(localStorage.getItem('notesMetadata') || '{}');
+            noteMetadata[noteId] = {
+                ...noteMetadata[noteId],
+                name: newName
+            };
+            
+            localStorage.setItem('notesMetadata', JSON.stringify(noteMetadata));
+            this.displayNotes();
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('renameModal'));
+            modal.hide();
+            
+            this.showToast('Note renamed successfully');
+        }
 
-
+        deleteAllNotes() {
+            if (confirm('Are you sure you want to delete all notes?')) {
+                localStorage.removeItem('notesData');
+                this.displayNotes();
+                this.showToast('All notes deleted', 'danger');
             }
         }
 
-        function currentNoteNameDisplay(currName) {
+        displayNotes() {
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            const notesList = document.getElementById('notesList');
+            notesList.innerHTML = '';
 
-            var viewnoteElements = document.querySelectorAll('.viewnote');
-            viewnoteElements.forEach(function (viewnoteElement) {
-                // viewnoteElement.addEventListener('click', function () { })
+            if (Object.keys(notesData).length === 0) {
+                notesList.innerHTML = '<div class="text-muted text-center">No notes created</div>';
+                return;
+            }
 
-                if (currName != viewnoteElement.textContent) {
-                    viewnoteElement.style.background = 'white';
-                    viewnoteElement.parentElement.style.background = 'white';
-                    viewnoteElement.style.fontWeight = 'lighter';
-                    viewnoteElement.style.padding = '0px';
-                    // viewnoteElement.remove('*')
-
+            Object.keys(notesData).reverse().forEach(noteName => {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'note-item d-flex justify-content-between align-items-center mb-2';
+                if (noteName === this.currentNote) {
+                    noteDiv.classList.add('active');
                 }
-                else {
-                    viewnoteElement.style.background = 'whitesmoke';
-                    viewnoteElement.parentElement.style.background = 'whitesmoke';
-                    viewnoteElement.style.padding = '5px';
-                    viewnoteElement.parentElement.style.padding = '5px';
-                    viewnoteElement.style.fontWeight = '900';
+                
+                const storedName = this.getNoteName(noteName);
+                noteDiv.setAttribute('data-note-id', noteName);
+                noteDiv.innerHTML = `
+                    <span class="note-title">${storedName}</span>
+                    <i class="fas fa-pencil edit-title-icon" title="Rename" data-note="${noteName}"></i>
+                    <div class="note-actions">
+                        <i class="fas fa-copy" title="Copy" data-note="${noteName}"></i>
+                        <div class="dropdown d-inline">
+                            <i class="fas fa-download" title="Download" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item download-md" href="#" data-note="${noteName}">Download as .md</a></li>
+                                <li><a class="dropdown-item download-txt" href="#" data-note="${noteName}">Download as .txt</a></li>
+                            </ul>
+                        </div>
+                        <i class="fas fa-trash-alt text-danger" title="Delete" data-note="${noteName}"></i>
+                    </div>
+                `;
 
-                }
-            })
-        }
-
-        window.onload = () => {
-
-            displayNotes()
-
-
-            const simplemde = new SimpleMDE({ element: document.getElementById("file-input"), spellChecker: false });
-            var viewnoteElements = document.querySelectorAll('.viewnote');
-
-            // Add an event listener to each element to get the corresponding note name value
-            viewnoteElements.forEach(function (viewnoteElement) {
-                viewnoteElement.addEventListener('click', function () {
-                    var noteName = this.textContent; // Get the text content of the span element
-                    currentNoteNameDisplay(noteName) // highlight the note selected
-                    var notesDataJSON = localStorage.getItem("notesData");
-                    var notesData = JSON.parse(notesDataJSON);
-                    var noteValue = notesData[noteName];
-                    console.log(`${noteName} : ${noteValue}`);
-
-                    var textarea = document.createElement('textarea');
-                    textarea.value = noteValue;
-                    textarea.setAttribute("id", "file-input")
-                    textarea.placeholder = "Write Something..."
-                    textarea.autocomplete = "off";
-                    textarea.style.width = "inherit";
-                    textarea.style.height = "inherit";
-                    textarea.style.border = "none";
-                    textarea.style.outline = "none";
-                    textarea.style.padding = "5px";
-
-
-                    var saveButton = document.createElement('button');
-                    saveButton.setAttribute('class', 'savebutton')
-                    saveButton.innerHTML = `<i class="fas fa-save"></i> Save Note`;
-                    saveButton.style.paddingBottom = '5px';
-
-
-
-                    saveButton.onclick = () => {
-                        notesData[noteName] = textarea.value;
-                        localStorage.setItem('notesData', JSON.stringify(notesData));
-                        let messageDiv = document.querySelector('.messagediv');
-                        messageDiv.style.color = "green";
-                        messageDiv.style.fontWeight = "bold";
-
-
-                        messageDiv.innerText = 'Note Saved!';
-                        setTimeout(() => {
-                            messageDiv.innerText = '';
-                        }, 2000);
-
+                // Add click handler to the entire note div
+                noteDiv.addEventListener('click', (e) => {
+                    // Ignore clicks on action buttons
+                    if (e.target.closest('.note-actions') || e.target.classList.contains('edit-title-icon')) {
+                        return;
                     }
-
-                    var mainContainer = document.querySelector('.main-container');
-                    mainContainer.innerHTML = '';
-                    mainContainer.appendChild(textarea);
-                    var br = document.createElement('br');
-                    mainContainer.appendChild(br);
-
-                    mainContainer.appendChild(saveButton);
-
-
-
-
-                });
-
-            });
-
-            const deleteIcons = document.querySelectorAll('.delete-icon');
-
-            // Add click event listener to each delete icon
-            deleteIcons.forEach(icon => {
-                icon.addEventListener('click', (event) => {
-                    const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText;
-                    var notesDataJSON = localStorage.getItem("notesData");
-                    var notesData = JSON.parse(notesDataJSON);
-                    // Remove note from local storage
-                    delete notesData[noteName];
-                    localStorage.setItem("notesData", JSON.stringify(notesData));
-                    // Remove note from UI
-                    const noteContainer = event.target.parentElement.parentElement;
-                    const hrElement = noteContainer.nextElementSibling;
-                    noteContainer.remove();
-                    hrElement.remove();
-                    location.reload();
-
-
-                });
-            });
-
-            // download
-            const downloadIcons = document.querySelectorAll('.download-icon');
-
-            // Add click event listener to each download icon
-            downloadIcons.forEach(icon => {
-                icon.addEventListener('click', (event) => {
-                    const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText;
-                    // const noteContent = localStorage.getItem('notesData')[noteName];
-                    const noteContent = JSON.parse(localStorage.getItem('notesData'))[noteName]
-                    // Create a new blob object with the note content and set the MIME type to text/plain
-                    const blob = new Blob([noteContent], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-
-                    // Create a new anchor element with the generated URL and set the download attribute to the note name
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `${noteName}.txt`;
-
-                    // Trigger a click event on the anchor element to initiate the download
-                    link.click();
-                });
-            });
-
-            // Add click event listener to copy icon
-            const copyIcons = document.querySelectorAll('.copy-icon');
-            copyIcons.forEach(function (copyIcon) {
-                copyIcon.addEventListener('click', function () {
-
-                    copyIcon.addEventListener('click', (event) => {
-                        const noteName = event.target.parentElement.parentElement.querySelector('.viewnote').innerText;
-                        const noteValue = JSON.parse(localStorage.getItem('notesData'))[noteName];
-                        navigator.clipboard.writeText(noteValue)
-                            .then(() => {
-                                let messageDiv = document.querySelector('.messagediv');
-                                messageDiv.style.background = "green";
-                                messageDiv.style.color = "white";
-                                messageDiv.style.fontWeight = "bold";
-                                messageDiv.innerText = 'Note copied to clipboard';
-                                setTimeout(() => {
-                                    messageDiv.innerText = '';
-                                }, 2000);
-                            })
-                            .catch((error) => {
-                                console.log('Error copying note to clipboard:', error);
-                            });
+                    
+                    // Remove active class from all notes
+                    document.querySelectorAll('.note-item').forEach(item => {
+                        item.classList.remove('active');
                     });
+                    
+                    // Add active class to clicked note
+                    noteDiv.classList.add('active');
+                    
+                    // Open the note
+                    this.openNote(noteName);
+                });
 
-                })
-            })
-
-
+                notesList.appendChild(noteDiv);
+            });
         }
-    </script>
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLM17GZ43H"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
 
-        gtag('config', 'G-ZLM17GZ43H');
+        openNote(noteName) {
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            const editorContainer = document.getElementById('editorContainer');
+            
+            // Update currentNote
+            this.currentNote = noteName;
 
+            // Create or update editor
+            if (!this.editor) {
+                editorContainer.innerHTML = '<textarea id="editor"></textarea>';
+                this.editor = new SimpleMDE({
+                    autosave: {
+                        enabled: true,
+                        uniqueId: this.currentNote,
+                        delay: 1000,
+                    },
+                    element: document.getElementById('editor'),
+                    spellChecker: false,
+                    autofocus: true,
+                    placeholder: "Write something...",
+                    toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "|", "preview"],
+                    renderingConfig: {
+                        singleLineBreaks: false,
+                        codeSyntaxHighlighting: true,
+                    }
+                });
+            }
+
+            const noteContent = notesData[noteName];
+            // Handle both old format (string) and new format (object with markdown/html)
+            const markdownContent = typeof noteContent === 'string' ? noteContent : noteContent?.markdown || '';
+            this.editor.value(markdownContent);
+            
+            // Add save button if not exists
+            if (!document.getElementById('saveButton')) {
+                const saveBtn = document.createElement('button');
+                saveBtn.id = 'saveButton';
+                saveBtn.className = 'btn btn-primary mt-3';
+                saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save Note';
+                saveBtn.onclick = () => this.saveCurrentNote();
+                editorContainer.appendChild(saveBtn);
+            }
+        }
+
+        saveCurrentNote() {
+            if (!this.currentNote || !this.editor) return;
+
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            notesData[this.currentNote] = this.editor.value();
+            localStorage.setItem('notesData', JSON.stringify(notesData));
+            this.showToast('Note saved successfully');
+        }
+
+        copyNote(noteName) {
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            const noteContent = notesData[noteName];
+            
+            // Handle both old format (string) and new format (object)
+            const contentToCopy = typeof noteContent === 'string' ? 
+                noteContent : 
+                noteContent?.markdown || '';
+
+            navigator.clipboard.writeText(contentToCopy)
+                .then(() => this.showToast('Note copied to clipboard'))
+                .catch(err => this.showToast('Failed to copy note', 'danger'));
+        }
+        downloadNote(noteName, file_ext) {
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            const blob = new Blob([notesData[noteName]], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `note-${new Date(parseInt(noteName)).toLocaleDateString()}.${file_ext}`;
+            link.click();
+            URL.revokeObjectURL(url);
+            this.showToast('Note downloaded');
+        }
+
+        deleteNote(noteName) {
+            if (!confirm('Are you sure you want to delete this note?')) return;
+
+            const notesData = JSON.parse(localStorage.getItem('notesData') || '{}');
+            delete notesData[noteName];
+            localStorage.setItem('notesData', JSON.stringify(notesData));
+            this.displayNotes();
+            
+            if (this.currentNote === noteName) {
+                document.getElementById('editorContainer').innerHTML = `
+                    <div id="welcomeMessage" class="text-center py-5">
+                        <h1>LokalNotes</h1>
+                        <p class="lead">On-Browser Notesapp</p>
+                    </div>
+                `;
+                this.editor = null;
+                this.currentNote = null;
+            }
+            
+            this.showToast('Note deleted', 'danger');
+        }
+
+        setupEventListeners() {
+            document.addEventListener('click', (e) => {
+                const noteId = e.target.dataset.note;
+                
+                if (e.target.classList.contains('fa-copy')) {
+                    this.copyNote(noteId);
+                } else if (e.target.classList.contains('download-md')) {
+                    e.preventDefault();
+                    this.downloadNote(noteId, 'md');
+                } else if (e.target.classList.contains('download-txt')) {
+                    e.preventDefault();
+                    this.downloadNote(noteId, 'txt');
+                } else if (e.target.classList.contains('fa-trash-alt')) {
+                    this.deleteNote(noteId);
+                } else if (e.target.classList.contains('fa-pencil')) {
+                    const modal = new bootstrap.Modal(document.getElementById('renameModal'));
+                    document.getElementById('noteToRename').value = noteId;
+                    document.getElementById('newNoteName').value = this.getNoteName(noteId);
+                    modal.show();
+                }
+            });
+
+            // Auto-save functionality
+            let saveTimeout;
+            if (this.editor) {
+                this.editor.codemirror.on('change', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(() => this.saveCurrentNote(), 1000);
+                });
+            }
+        }
+    }
+
+    // Initialize the app
+    const app = new NotesApp();
+
+    // Global functions for HTML onclick handlers
+    function createNote() {
+        app.createNote();
+    }
+
+    function deleteAllNotes() {
+        app.deleteAllNotes();
+    }
     </script>
 </body>
-
 </html>
